@@ -1,0 +1,160 @@
+---
+title: "**Institutions are What Made of Your History: Border Management Practices in France, Finland and Turkey**"
+subtitle: ""
+author:
+  - Muhammet Özkaraca
+  - International Center for Migration Policy Development
+  - muhammetozk@icloud.com
+output: pdf_document
+abstract: |
+  Border management has become essential for countries due to the increasing volumes of border crossings in recent years, driven principally by international trade, irregular migration, and security concerns. This multidimensional situation has prompted growing concerns about homeland safety, leading societies to pressure their governments to strengthen their border management systems across the European Union and its neighboring countries. To this end, this study presents a comparative case study of three different border management systems by analyzing the French, Finnish, and Turkish cases. Using official reports and descriptive statitics from different sources, it is argued that different historical trajectories, divergent needs, and threat perceptions have led the aforementioned countries to adapt diverse border management systems, which this paper aims to provide an overview of. Additionally, it is hoped that this work will start a new discussion regarding the origins and impacts of institutions responsible for border management in a growing body of literature where only the effectiveness of border security measures is discussed.
+geometry: "left = 2.5cm, right = 2.5cm, top = 2.5cm, bottom = 2.5cm"
+fontsize: 12 pt
+link-citations: true
+link-color: red
+urlcolor: blue
+biblio-style: apsr
+ident: True
+bibliography: ["Border Management References.bib"]
+mainfont: "Times New Roman"
+monofont: "Courier New" #To change the font based on the available ones insatlled on the computer, search font book and click on all fonts. Then you can pick up the ones installed on your computer and you can use them. 
+linestretch: 1.5
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+\newpage
+# Introduction
+
+$\qquad$ Volumes of border crossings between countries have surged to unprecedented levels in recent years. The escalating numbers of immigrants brought by interstate and intrastate wars in various parts of the world, along with the rising numbers of illegal human trafficking and the increasing international trade between countries through the exchange of goods and services can be cited as other major factors contributing to this sharp increase. 
+
+$\qquad$ Therefore, controlling borders has become more crucial for states with its two distinct dimensions—security and non-security aspects[^1]. On the one hand, it is the obligation of each sovereign state to ensure the security of its own territory by enforcing border controls that avert the emergence of both traditional and non-traditional security threats, such as terrorism and cyberattacks[^2]. On the other hand, governments must secure the flows of goods, services, and logistics across their borders to ensure that their transactions are not disrupted and, as a result, the economy does not suffer in such a globalized world where international trade is more crucial than ever for each country to sustain its economic activities. 
+
+[^1]: Aas [-@aas_crimmigrant_2011] makes a similar analysis in a different context as *Crimmigrant* bodies and *bona fide travelers*.
+
+[^2]: See Hameiri and Jones [-@hameiri_politics_2013] on the emergence of non-traditional security threats.
+
+
+$\qquad$ Striking a balance between the security and non-security aspects of border management is quintessential for countries, when managing borders requires total coordination and collaboration between various state and non-state entities. Countries must implement effective border management techniques to create a balance in governing borders since placing an undue emphasis on the security component will have a negative impact on the non-security part, and vice versa. 
+
+$\qquad$ While many studies and policy guidelines regarding how to achieve harmony among state and non-state institutions have been published [@aniszweski_coordinated_2009; @tholens_border_2017; @noauthor_guidelines_2010], the need for maintaining coordination through communication channels with various stakeholders in the most effective way is depicted as a critical component [@doyle_collaborative_2010]. However, establishing and maintaining such networks cannot guarantee the success of border management schemes. The organizational structure and relevant norms and procedures must be dynamic and adaptable in order to counter new risks as the nature and magnitude of threats may change over time. Accordingly, a new dimension is also added to preceding equilibrium, where not only intra-state level harmony but also inter-state level mutual understanding and cooperation among countries gained importance to govern borders in a more effective way [-@noauthor_guidelines_2007]. 
+
+$\qquad$ Above all to these criteria, nations must take their needs and goals into account that can differ from one case to another, while building an effective border management approach. That is to say, while some countries that are geographically close to armed conflicts may prioritize the security aspect of border management practices, others that are less likely to face such threats may place a higher priority on regulating non-security-related issues, such as trade-focused topics [@sert_turkeys_2013]. This point also helps to explain why certain nations currently place a greater emphasis on military means to control their borders and others do not. To illustrate this, the Figure \ref{fig:Fragile State Index} presents a comparison on countries' migration pressures versus their security threats to understand why different countries might have distinct border management systems using the data obtained from the Fragile State Index [@messner_de_latour_fragile_2022].
+
+```{r Fragile State Index, fig.cap = "Security Threats and Migration Pressure Across EU Countries and Turkey", echo=FALSE, fig.align='center', out.width = '80%', out.height = '80%', warning=FALSE,error=FALSE, message=FALSE}
+
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(countrycode)
+library(ggrepel)
+library(showtext)
+library(ggtext)
+
+setwd("/Users/muhammetozkaraca/Desktop/Best Practices in Border Management/Data Analysis_Fragile State Index/Fragile State Index - Data Files")
+
+fsi_data <- list.files(path = "/Users/muhammetozkaraca/Desktop/Best Practices in Border Management/Data Analysis_Fragile State Index/Fragile State Index - Data Files", 
+                       full.names = TRUE, pattern = "\\.xlsx$") %>%
+  lapply(read_excel) %>%
+  lapply(\(x) mutate(x, across(Year, as.character))) %>%
+  bind_rows() %>%
+  mutate(Year = as.Date(Year, origin = "1964-10-22"))
+  
+fsi_data$Year <- format(fsi_data$Year, format="%Y")
+fsi_data$Year <- as.numeric(fsi_data$Year)
+
+fsi_data$abbreviation <- countrycode(fsi_data$Country, origin = "country.name", 
+                                     destination = "iso3c")
+
+
+font_add_google("Libre Caslon Display", family = "title")
+font_add_google("Playfair Display", family = "subtitle")
+font_add_google("PT Serif", family = "caption")
+
+showtext_auto()
+
+plot <- fsi_data %>%
+  group_by(abbreviation) %>%
+  dplyr::summarize(refugee = mean(`S2: Refugees and IDPs`),
+                   security = mean(`C1: Security Apparatus`)) %>%
+  select(abbreviation, refugee, security) 
+
+graph <- ggplot(plot, aes(x = security, y = refugee)) +
+  geom_jitter(size = 1, alpha = 0.5) +
+  geom_point(data = plot %>% filter (abbreviation %in% c("TUR", "FRA", "FIN")), color = "red", size = 1) +
+  geom_text(data = plot %>% filter (abbreviation %in% c("TUR", "FRA", "FIN")), 
+            aes(label = abbreviation), size = 4, nudge_x = 0.15, nudge_y = 0.2, 
+            color = "red", fontface = "bold") +
+  geom_vline(xintercept = mean(plot$refugee), linetype = "dashed", color = "grey20", alpha = 0.5) +
+  geom_hline(yintercept = mean(plot$security), linetype = "dashed", color = "grey20", alpha = 0.5) +
+  labs(title = "Average Scores of Security Threats and Migration Pressure for Countries<br>(2006-2022)",
+       x = "<span style = 'font-size:12pt;'>Security Threats</span>",
+       y = "<span style = 'font-size:12pt;'>Migration Pressure</span>",
+       caption = expression(paste(italic("Source:"), " The author's own compilation based on the Fragile State Index."))) +
+  theme_minimal() +
+  theme(plot.background = element_rect(fill = "white",colour = NA),
+        panel.background = element_rect(fill = 'white', colour = 'white'),
+        panel.border = element_blank(),
+        legend.position = "none",
+        plot.title = element_markdown(hjust = 0.5, family = "title", size = 15),
+        plot.subtitle = element_markdown(hjust = 0.5, family = "subtitle", size = 12), # note that to color numbers differently, I used element_markdown not element_text function
+        axis.title.x = element_markdown(hjust = 0.5, family = "subtitle", size = 10),
+        axis.title.y = element_markdown(hjust = 0.5, family = "subtitle", size = 10),
+        plot.caption = element_text(hjust = 0, size = 7, family = "caption"))
+
+graph
+```
+
+$\qquad$ Annually published since 2006, the Fragile State Index (SFI) data offers a ground to analyze countries' stances based on different parameters [@messner_de_latour_fragile_2022]. Among them, while *Security Threats* indicates threats directed to a state, such as bombings, attacks and battle-related deaths, rebel movements, mutinies, coups, or terrorism, *Migration Pressure* specifies pressures upon states caused by the forced displacement of large communities. In this regard, Figure \ref{fig:Fragile State Index} lays out 179 countries' stances based on Security Threats vs. Migration Pressure nexus by taking average of their scores between 2006 and 2022. 
+
+$\qquad$ Scaling from 0, *the least*, to 10, *the most*, Turkey is relatively in a more onerous position with regards to the security threats and migration pressure, compared to the other two cases of this study and average of the whole. While repercussions of this position into the border management systems and pertinent institutions will be taken into consideration later, it is crucial to notice, at this point, that the higher threat perception might turn countries to allocate more military means to protect their borders. 
+
+$\qquad$ In this 
+
+
+\newpage
+
+```{r Figure2, fig.cap = "Unit of Analysis in Comparing Border Management Practices", echo=FALSE, fig.align='center', out.width = '70%', warning=FALSE,error=FALSE, message=FALSE}
+
+
+library(knitr)
+library(dplyr)
+library(kableExtra)
+library(gt)
+library(gtExtras)
+
+data <- data.frame(c("Type","Challenge","Scale","Agency","Measure"),
+                   c("Types of Borders", "Types of Challenges Against Borders",
+                     "Scale of the Challenge", 
+                     "Involved Agencies in Border Management",
+                     "Measures taken to alleviate or lessen border concerns"),
+                   c("Land/Air/Maritime Borders, External/Internal EU Borders", 
+                     "Terrorism, Irregular Migration, Human 
+                     Trafficking","Scale of Terror Events, Number of Irregular
+                     Immigrants", "Ministry of Interior, Ministry of National
+                     Defense", "Migration Policies"))
+
+names(data)[1] <- "Units"
+names(data)[2] <- "Definitions"
+names(data)[3] <- "Examples"
+
+table_code <- gt(data) %>% 
+  gt_theme_538() %>%
+  tab_header(title = "Unit of Analysis in Comparing Border Management Practices") %>%
+  tab_footnote(footnote = md("*Source*: Author's own compliation based on International Consultant Emmanuel's previous communication with the project team."))
+  
+
+
+```
+
+\setstretch{1.5}
+
+$\qquad$ To illustrate what practical applications may be used while drafting the Turkish national IBM strategy, border management practices in the selected three European countries are chosen by their similarity to the Turkish context based on the classification given in the Figure \ref{fig:Figure2}. The selection rationale, along with each country's border management activities, will be scrutinized separately in particular chapters. It is intended that the audience will gain a general perspective on the best border management practices across European countries and further research into which applications can be applied in Turkey will be conducted.
+
+\newpage
+
+\newpage
+# References
